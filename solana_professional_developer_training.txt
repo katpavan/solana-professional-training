@@ -1,0 +1,328 @@
+Solana Professional Developer Day 1 Training 
+-----
+
+this was all of crytpography for 5 to 7 thousand years
+
+symmmetric crypto -> sender and recipient decide a secret -> sender encrypts using the secret -> recipient decrypts using the same secret
+
+the germans had the enigma machine, but it was cracked by the british
+
+AES is currently used now
+
+hard drives on mac uses AES
+
+-----
+ 
+1970s asymmetric crypto came out
+
+RSA was made
+
+gchq (british spy agency) used it for spies
+
+sender and recipient each have a  keypair:
+
+a public key (they can show to everyone)
+
+a private key (which is kept secret)
+
+-----
+
+asymmetric encrpytion
+
+sender encrypts data 
+
+with recipient's public key
+
+recipient decrypts data, using their private key. 
+
+-----
+
+assymetric encryption example:
+
+websites (click the lock, and you'll see all of this)
+
+only the website can read your calls
+
+-----
+
+signing 
+
+signer encrypts some data with their own private key.
+
+anyone can use the signer's public key to prove the signer signed it
+
+ex: every solana tx is signed
+
+-----
+
+asymmetric signing example:
+
+passports
+
+governments have private keys sign your passports and airports can check your key to see if it was signed by your government (they have access to the governments public keys)
+
+-----
+
+LAB
+
+mkdir solana-training
+cd solana-training
+git init .
+npm init -y
+npm i @solana/web3.js @solana-developers/helpers esrun
+
+	@solana is a username
+-----
+touch generate-keypair.ts
+
+code:
+	import { Keypair } from "@solana/web3.js";
+	const keypair = Keypair.generate();
+	console.log('The public key is', keypair.publicKey.toBase58()); //how we store public keys 
+	console.log('The private key is', keypair.secretKey);
+	console.log(keypair, `Generated keypair!`);
+
+npx esrun generate-keypair.ts
+
+	The public key is Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q
+	The private key is Uint8Array(64) [
+		...
+	]
+	Keypair {
+	  _keypair: {
+	    publicKey: Uint8Array(32) [
+	      176, 116, 169, 137, 170, 239,  90, 175,
+	       20, 237, 242,   7,  71,  16, 254, 108,
+	      239, 120, 161,  21, 159,  30, 101, 124,
+	      141,  63, 133, 246,  65,  13, 149, 160
+	    ],
+	    secretKey: Uint8Array(64) [
+			...
+	    ]
+	  }
+	} Generated keypair!
+
+-----
+touch load-keypair.ts
+
+	import "dotenv/config";
+	import { getKeypairFromEnvironment } from "@solana-developers/helpers";
+
+	const keypair = getKeypairFromEnvironment("SECRET_KEY");
+
+	console.log(
+		`Finished! We've loaded our keypair securely, using an env file! Our public key is: ${keypair.publicKey.toBase58()}`);
+
+npx esrun load-keypair.ts
+
+	Finished! We've loaded our keypair securely, using an env file! Our public key is: Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q
+
+
+-----
+on solana
+
+	edwards curve positive values are the public keys (public addresses on solana)
+
+	not overlapping transactions don't delay each other
+
+	how does solana stop ddos attacks?
+
+		local fee markets (for your particular rpc node)
+
+	right now they're thinking how to do priority fees better
+
+-----
+
+solana has multiple clusters
+	
+	devnet (staging)
+
+	localnet (on your computer) 
+		localhost validator included with Solana CLI
+
+-----
+
+npx esrun check-balance.ts
+
+	Connected to devnet
+	Finished! The balance for the wallet at address Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q is 0)
+
+
+-----
+
+
+faucet.solana.com/
+
+or the helper function:
+	
+	import {
+		getKeypairFromEnvironment,
+		airdropIfRequired,
+	} from "@solana-developers/helpers";
+
+	await airdropIfRequired(
+		connection,
+		keypair.publicKey,
+		1 * LAMPORTS_PER_SOL,
+		0.5 * LAMPORTS_PER_SOL //give me 1 sol if my balance is below 0.5
+	)
+
+npx esrun check-balance.ts
+
+	Connected to devnet
+	Finished! The balance for the wallet at address Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q is 5)
+-----
+
+Paste your wallet address into @mikemaccana on Twitter
+
+Get other wallet addresses from https://tinyurl.com/4fetsh7a
+
+Update check-balance.ts
+
+npx esrun check-balance.ts
+
+	Connected to devnet
+	Finished! The balance for the wallet at address Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q is 5)
+	NIHAR 5
+	UMAR 30
+	JESS 1
+	AADIL 6
+	DREW 6
+	SATYA 5
+	PAVAN 5
+	DAN 1
+	MIKE 4.929965
+
+------
+
+LESSON 3: Sending Transactions
+
+Programs have addresses on edward curves
+
+
+	alice sends bob 10 sol
+
+		this has an address
+			system program 
+				transfer()
+
+		this has an address
+			memo program
+				memo()	
+					solfalre doesn't show memos
+
+		this has an address
+			alice's wallet
+				@15 sol
+
+		this has an address
+			bob's wallet
+				@27 sol 
+
+transactions are atomic, they're either 0 or 1 
+	they either work or they don't
+
+lighthouse is a program
+
+	that asserts at the end of the interaction with a program that i dont trust that much
+		the balances of all my accounts should be this, attached to my wallet, and if none of those assertions aren't correct then the transaction fails 
+
+programs and data are stored separately
+
+solana explorer
+	instructions
+
+		you can look at the system program: transfer
+			running the transfer instruction handler
+
+		and the memo program: memo
+			running the memo instruction handler
+
+touch send-sol.ts
+
+npx esrun send-sol.ts
+
+npx esrun check-balance.ts 
+
+-----
+
+go here https://spl.solana.com/memo
+
+	grab this
+		
+		MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr
+
+------
+
+all the programs maintained by solana are here 
+
+	https://spl.solana.com/
+
+solana stack exchange
+
+	https://solana.stackexchange.com/
+
+------
+
+The Token Program
+
+	Address
+		USDC MINT 
+			solana does more usdc than any other blockchain 
+
+			this is where USDC lives on solana 
+
+	Address	
+		Associated token account program
+			buildATA() 
+				* this is an instruction 
+
+	Address 
+		Alice's Wallet 
+			@15 SOL 
+
+				Program Derived Address
+					Alice's USDC Associated Token Account ($) 0
+
+Alice's USDC Account is a program derived address
+
+	made from:
+
+		* the associated token account program
+		* the usdc mint address
+		* alice's wallet address
+
+	PDAs are key stores like redis 
+
+	PDAs are not on an edward curve, because it's derived 
+
+		they don't have private keys 
+
+	if I want to have a a PDA made of an eth address and verify that they own that eth address then I would have to get the user to sign something with that eth private key 
+
+	PDAs
+		inputs -> address 
+
+		subset of this 
+
+			associated token accounts
+
+				wallet and mint are inputs 
+
+					->
+
+						address is output
+
+---------------
+
+npm i @solana/spl-token
+
+touch make-token.ts 
+
+npx esrun make-token.ts 
+
+	Loaded our keypair securely, using an env file! Our public key is: Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q
+	
+	Token mint address: https://explorer.solana.com/address/7NzkrKbimu5As7e9SjoLckjjWfvySHjxVSPpRZSPhfK4?cluster=devnet
+
+
