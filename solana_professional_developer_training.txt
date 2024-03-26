@@ -327,8 +327,32 @@ npx esrun make-token.ts
 
 
 ------
+
+minting and sending 
+	Address 
+		Mint
+			Mint Address 
+	
+	Address
+		Alice's wallet (also Mint Authority)
+			@5 SOL 
+	
+	Address
+		Bob's wallet
+			@37 SOL
+	
+	Program Derived Address 
+		Bob's USDC Associated Token Account 
+		(4) 8,900
+
+	Let's mint new tokens and transfer them to Bob!
+
 make a token account for a recipient 
 
 	touch make-token-account.ts
 
 	npx esrun make-token-account.ts
+
+		Loaded our keypair securely, using an env file! Our public key is: Csow2ZKPGyC9QzpUufvZozMvQgvmRX9jymMoZ6NeTQ3q
+		Token Account: HV7Rr1h3tHrr9Yo7rsaTvWdXo38zDydzZfr7HCSAboak
+		Created token Account: https://explorer.solana.com/address/HV7Rr1h3tHrr9Yo7rsaTvWdXo38zDydzZfr7HCSAboak?cluster=devnet
