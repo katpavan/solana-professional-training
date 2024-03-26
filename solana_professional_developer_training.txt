@@ -326,3 +326,9 @@ npx esrun make-token.ts
 	Token mint address: https://explorer.solana.com/address/7NzkrKbimu5As7e9SjoLckjjWfvySHjxVSPpRZSPhfK4?cluster=devnet
 
 
+------
+make a token account for a recipient 
+
+	touch make-token-account.ts
+
+	npx esrun make-token-account.ts
